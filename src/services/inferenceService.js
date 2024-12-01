@@ -15,12 +15,11 @@ async function predictClassification(model, image) {
         const label = confidenceScore <= 50 ? "Non-cancer" : "Cancer"
         let suggestion;
         if (label === "Cancer") {
-            suggestion = "Segera periksa ke dokter!"
+            suggestion = "Segera periksa ke dokter!";
+        } else if (label === "Non-cancer") {
+            suggestion = "Penyakit kanker tidak terdeteksi.";
         }
-        if (label === "Non-cancer") {
-            suggestion = "Penyakit kanker tidak terdeteksi"
-        }
-        return { label, suggestion }
+        return { label, suggestion };
     } catch (error) {
         throw new InputError("Terjadi kesalahan dalam melakukan prediksi")
     }

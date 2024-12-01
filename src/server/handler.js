@@ -1,13 +1,16 @@
 const { storeData, getAllData } = require("../services/firestoreService");
 const predictClassification = require("../services/inferenceService");
 const crypto = require('crypto');
+
+const MAX_FILE_SIZE = 1 * 1024 * 1024; // Maksimal ukuran file 1 MB
+
 async function postPredictHandler(request, h) {
     const { image } = request.payload;
     const { model } = request.server.app;
     const id = crypto.randomUUID();
     const createdAt = new Date().toISOString();
 
-    if (image.length > 1000000) {
+    if (image.bytes > MAX_FILE_SIZE) {
         const response = h.response({
             status: 'fail',
             message: 'Payload content length greater than maximum allowed: 1000000'
@@ -17,7 +20,7 @@ async function postPredictHandler(request, h) {
     }
 
     try {
-        const { label, suggestion } = predictClassification(model, image);
+        const { label, suggestion } = await predictClassification(model, image);
         const data = {
             "id": id,
             "result": label,
@@ -25,7 +28,7 @@ async function postPredictHandler(request, h) {
             "createdAt": createdAt
         };
 
-        await storeData(id, data) // penting bingittzz
+        // await storeData(id, data) // penting bingittzz
         const response = h.response({
             status: 'success',
             message: 'Model is predicted successfully.',
@@ -45,7 +48,7 @@ async function postPredictHandler(request, h) {
 
 async function postPredictHistoriesHandler(request, h) {
     const allData = await getAllData();
-    
+
     const formatAllData = [];
     allData.forEach(doc => {
         const data = doc.data();
@@ -59,13 +62,13 @@ async function postPredictHistoriesHandler(request, h) {
             }
         });
     });
-    
+
     const response = h.response({
-      status: 'success',
-      data: formatAllData
+        status: 'success',
+        data: formatAllData
     })
     response.code(200);
     return response;
-  }
+}
 
-module.exports = {postPredictHandler, postPredictHistoriesHandler};
+module.exports = { postPredictHandler, postPredictHistoriesHandler };

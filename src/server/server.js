@@ -2,6 +2,7 @@ const Hapi = require('@hapi/hapi');
 const routes = require('../server/routes');
 require('dotenv').config();
 const loadModel = require('../services/loadModel');
+const InputError = require('../exceptions/InputError');
  
 (async () => {
 
@@ -20,7 +21,7 @@ const loadModel = require('../services/loadModel');
     const model = await loadModel();
     server.app.model = model;
     
-    server.route(routes);  // Akan dibahas lebih lanjut setelah pembahasan extension.
+    server.route(routes); 
     server.ext('onPreResponse', function (request, h) {
         const response = request.response;
         if (response instanceof InputError) {
