@@ -9,10 +9,9 @@ const routes = [
       payload: {
         allow: 'multipart/form-data',
         multipart: true,
-        
+        maxBytes: 1024 * 1024
       }
     }
-
   },
   {
     path: '/predict/histories',

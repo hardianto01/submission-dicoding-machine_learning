@@ -10,15 +10,6 @@ async function postPredictHandler(request, h) {
     const id = crypto.randomUUID();
     const createdAt = new Date().toISOString();
 
-    if (image.bytes > MAX_FILE_SIZE) {
-        const response = h.response({
-            status: 'fail',
-            message: 'Payload content length greater than maximum allowed: 1000000'
-        })
-        response.code(413);
-        return response;
-    }
-
     try {
         const { label, suggestion } = await predictClassification(model, image);
         const data = {
@@ -28,10 +19,10 @@ async function postPredictHandler(request, h) {
             "createdAt": createdAt
         };
 
-        // await storeData(id, data) // penting bingittzz
+        await storeData(id, data) // penting bingittzz
         const response = h.response({
             status: 'success',
-            message: 'Model is predicted successfully.',
+            message: 'Model is predicted successfully',
             data
         });
         response.code(201);
@@ -48,7 +39,7 @@ async function postPredictHandler(request, h) {
 
 async function postPredictHistoriesHandler(request, h) {
     const allData = await getAllData();
-
+    console.log(allData)
     const formatAllData = [];
     allData.forEach(doc => {
         const data = doc.data();
